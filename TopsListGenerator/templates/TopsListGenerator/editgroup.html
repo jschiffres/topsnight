@@ -1,0 +1,125 @@
+{% extends 'TopsListGenerator/base.html' %}
+
+{% block content %}
+
+{% if error %}
+
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+
+{% endif %}
+
+<div class="col-8 mx-auto">
+
+    <h1 class="text-center"><strong>Edit Group:</strong> {{ group.name }}</h1>
+
+    <hr class="rounded">
+
+</div>
+
+<div class="row">
+
+    <div class="col-6">
+
+        <h3>Details:</h3>
+
+        <form method="POST"> 
+        {% csrf_token %}
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="name" name="name" placeholder="name" value="{{ group.name }}">
+                <label for="name">Group Name</label>
+                <div id="nameHelp" class="form-text">Provide a name for this playlist</div>
+            </div>
+
+        <div class="form-floating mb-3">
+            <input type="number" class="form-control" id="playlistlength" name="playlistlength" placeholder="playlistlength" value="{{ group.playlistlength }}">
+            <label for="playlistlength">Playlist Length</label>
+            <div id="playlistlengthHelp" class="form-text">How long should this Topslist be?</div>
+        </div>
+
+        <div class="row">
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    <input type="date" class="form-control" id="min_date" name="min_date" placeholder="min_date" value="{{ group.min_date|date:'Y-m-d' }}">
+                    <label for="min_date">Minimum Song Release Date</label>
+                    <div id="mindateHelp" class="form-text">What is the earliest a song could have been released?</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    <input type="date" class="form-control" id="max_date" name="max_date" placeholder="max_date" value="{{ group.max_date|date:'Y-m-d' }}">
+                    <label for="max_date">Maximum Song Release Date</label>
+                    <div id="maxdateHelp" class="form-text">What is the latest a song could have been released?</div>
+                </div>
+            </div>     
+        </div>
+
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="password" name="password"placeholder="password" value="{{ group.password }}">
+                <label for="password">Group Password</label>
+                <div id="nameHelp" class="form-text">Choose a secure password</div>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="password2" name="password2"placeholder="password" value="{{ group.password }}">
+                <label for="password2">Repeat Group Password</label>
+                <div id="nameHelp" class="form-text">Ensure passwords match</div>
+            </div>
+
+        <div class="row">
+            <div class="col-6">
+                    <button type="submit" class="btn btn-primary">Save Group</button>
+            </div>
+        </form>
+            <div class="col-6 d-flex justify-content-end">
+                <form method="POST" action="{% url 'deletegroup' group.id %}">
+                	{% csrf_token %}
+                	<button type="submit" class="btn btn-danger">Delete Group</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-6">
+
+        <h3>Playlists:</h3>
+
+        {% if playlists %}
+
+            <form method="POST" action="{% url 'removeplaylistfromgroup' group.id %}">
+                    {% csrf_token %}
+
+                    <div class="form-floating mb-3">
+                        <select class="form-select" name="playlist" required id="id_playlist">
+                            {% for playlist in playlists %}
+                                <option value="{{ playlist.id }}">{{ playlist.name }} - {{ playlist.user }}</option>
+                            {% endfor %}
+                         </select>
+                        <label for="playlist">Group</label>
+                        <div id="playlistHelp" class="form-text">Select a submitted playlist (Playlist Name - User)</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-danger">Remove from Group</button>
+                    </div>
+
+                </form>
+
+        {% else %}
+
+            <h6 class="text-center">No playlists have been submitted to this group!</h6>
+
+            <div class="d-flex justify-content-center">
+                <form action="{% url 'viewgroup' group.pk %}">
+                        <button type="submit" class="btn btn-outline-primary me-2">Add Playlist</button>
+                </form>
+            </div>
+
+        {% endif %}
+    </div>
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'TopsListGenerator/base.html' %}
+
+{% block content %}
+
+
+<div class="row">
+
+    <div class="col-8">
+        <h1><strong>Topslist:</strong> {{ group.name }}</h1>
+    </div>
+
+    <div class="col-4 d-flex justify-content-end">
+        <form action="{{ playlist_url }}" target="_blank" rel="noopener noreferrer">
+            <button type="submit" class="btn btn-outline-primary">Listen Here</button>
+        </form>
+    </div>
+
+</div>
+
+<div>
+{{ group.playlistHTML|safe }}
+</div>
+
+{% endblock %}

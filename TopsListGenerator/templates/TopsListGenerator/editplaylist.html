@@ -1,0 +1,98 @@
+{% extends 'TopsListGenerator/base.html' %}
+
+{% block content %}
+
+{% if error %}
+
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+
+{% endif %}
+
+<div class="col-8 mx-auto">
+
+    <h1 class="text-center"><strong>Edit Playlist:</strong> {{ playlist.name }}</h1>
+
+    <hr class="rounded">
+
+</div>
+
+<div class="row">
+
+    <div class="col-6">
+
+        <h3>Details:</h3>
+
+        <form method="POST"> 
+        {% csrf_token %}
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="name" name="name" placeholder="name" value="{{ playlist.name }}">
+                <label for="name">Playlist Name</label>
+                <div id="nameHelp" class="form-text">Provide a name for this playlist</div>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="url" name="url"placeholder="url" value="{{ playlist.url }}">
+                <label for="url">Playlist URL</label>
+                <div id="nameHelp" class="form-text">Spotify playlist links only</div>
+            </div>
+
+        <div class="row">
+            <div class="col-6">
+                    <button type="submit" class="btn btn-primary">Save Playlist</button>
+            </div>
+        </form>
+
+            <div class="col-6 d-flex justify-content-end">
+                <form method="POST" action="{% url 'deleteplaylist' playlist.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete Playlist</button>
+                </form>
+            </div>
+        </div>        
+
+    </div>
+
+    <div class="col-6">
+
+        <h3>Groups:</h3>
+
+            {% if playlist.groups.all %}
+
+            	<form method="POST" action="{% url 'removegroupfromplaylist' playlist.id %}">
+                    {% csrf_token %}
+
+                    <div class="form-floating mb-3">
+                        <select class="form-select" name="group" required id="id_group">
+                            {% for group in playlist.groups.all %}
+                                <option value="{{ group.id }}">{{ group.name }}</option>
+                            {% endfor %}
+                         </select>
+                        <label for="group">Group</label>
+                        <div id="groupHelp" class="form-text">Select a group</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-danger">Remove from Group</button>
+                    </div>
+
+                </form>
+
+            {% else %}
+
+            <h6 class="text-center">This playlist has not been added to any groups!</h6>
+
+            <div class="d-flex justify-content-center">
+            	<form action="{% url 'allgroups' %}">
+            	    {% csrf_token %}
+            	    	<button type="submit" class="btn btn-outline-primary me-2">Add to Group</button>
+            	</form>
+            </div>
+
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

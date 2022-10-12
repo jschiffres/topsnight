@@ -1,0 +1,92 @@
+{% extends 'TopsListGenerator/base.html' %}
+
+{% block content %}
+
+{% if playlists %}
+
+<h1>{{ user.username }}'s Playlists</h1>
+
+	<div>
+
+	    <form action="{% url 'importplaylist' %}">
+		    	<button type="submit" class="btn btn-outline-primary me-2">Import Playlist</button>
+		</form>
+
+		<hr class="rounded">
+
+	        <div class="accordion" id="playlistsaccordion">
+	        	{% for playlist in playlists %}
+				<div class="accordion-item">
+			    	<h2 class="accordion-header" id="heading">
+			      		<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse--{{ playlist.pk }}" aria-expanded="true" aria-controls="collapse">
+			        		{{ playlist.name }}
+			      		</button>
+			    	</h2>
+				    <div id="collapse--{{ playlist.pk }}" class="accordion-collapse collapse" aria-labelledby="heading" data-bs-parent="#playlistsaccordion">
+				      	<div class="accordion-body">
+
+				      		<ul class="list-group list-group-horizontal d-flex justify-content-center">
+
+				        		<li class="list-group-item">
+				        			<form action="{{ playlist.url }}" target="_blank" rel="noopener noreferrer">
+							    		<button type="submit" class="btn btn-outline-primary">Listen Here</button>
+							    	</form>
+								</li>
+
+				        		<li class="list-group-item">
+					        	    <form action="{% url 'editplaylist' playlist.id %}">
+	              						<button type="submit" class="btn btn-primary">Edit Playlist</button>
+	          						</form>
+		          				</li>
+
+		          				<li class="list-group-item">		
+	          						<form method="POST" action="{% url 'refreshplaylist' playlist.id %}">
+	            					{% csrf_token %}
+	              						<button type="submit" class="btn btn-dark">Refresh Playlist</button>
+	          						</form>
+	          					</li>
+
+	          					<li class="list-group-item">
+	          						{% if playlist.groups.all %}
+		          						<div class="dropdown">
+	  										<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">Groups
+	  										</button>
+	  										<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+	  											{% for group in playlist.groups.all %}
+											    <li>
+											    	<a href="{% url 'viewgroup' group.pk %}" class="dropdown-item" target="_blank" rel="noopener noreferrer">{{ group }}</a>
+											    </li>
+											    {% endfor %}
+											    <li><hr class="dropdown-divider"></li>
+											    <li><a class="dropdown-item" href="{% url 'usergroups' %}"><strong>Add to Group</strong></a></li>
+										  	</ul>
+										</div>
+									{% else %}
+					        	    	<form action="{% url 'usergroups' %}">
+	              							<button type="submit" class="btn btn-secondary">Add to Group</button>
+	          							</form>
+									{% endif %}
+								</li>	          					
+	          				</ul>
+
+	          				<hr class="rounded">
+	          					
+	          				{{ playlist.playlistHTML|safe }}
+
+				      	</div>
+				    </div>
+				</div>
+				{% endfor %}
+			 </div>
+	    
+	    {% else %}
+
+	        <div class="text-center">
+	            <h2>Looks like you don't have any playlists imported!</h2>
+	        	<br>
+	        	<a role="button" class="btn btn-outline-primary" href="{% url 'importplaylist' %}">Import Playlist</a>
+	        </div>
+	    {% endif %}
+	</div>
+
+{% endblock %}

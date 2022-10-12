@@ -1,0 +1,209 @@
+{% extends 'TopsListGenerator/base.html' %}
+
+{% block content %}
+
+{% if error %}
+
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+
+{% endif %}
+
+<div class="col-8 mx-auto">
+	<h1 class="text-center"><strong>Group:</strong> {{ group.name }}</h1>
+	
+	<p class="fst-italic text-center">Created by: {{ group.user }} on {{ group.created|date:"M d, Y" }}</p>
+
+	<div class="one d-flex justify-content-center">
+		<button type="button" class="btn btn-outline-dark btn-sm" onclick="copyText()" data-bs-toggle="popover" title="Link Copied!">Share Group</button>
+		    <script>
+		        function copyText() {     
+		            /* Copy text into clipboard */
+		            navigator.clipboard.writeText
+		                ("http://127.0.0.1:8000/ViewGroup/"+{{ group.id }}+"?");
+		        }
+		    </script>
+		      <script type="text/javascript">
+				var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+				var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+				  return new bootstrap.Popover(popoverTriggerEl)
+				})
+  			</script>
+	</div>
+
+	<hr class="rounded">
+</div>
+
+<div class="row">
+
+	<div class="col-6">
+
+		<div class="card">
+
+		  <div class="card-header">
+		    <h3>Add to {{ group.name }}:</h3>
+		  </div>
+
+  			<div class="card-body">
+
+  			{% if user.is_authenticated %}
+				{% if playlists %}
+
+				<form method="POST" action="{% url 'viewgroup' group.pk %}"> 
+		        	{% csrf_token %}
+		            <div class="form-floating mb-3">
+		                <select class="form-select" aria-label="Default select example" name="playlist" required id="id_playlist">
+			                {% for p in playlists %}
+			                	<option value="{{ p.id }}">{{ p.name }}</option>
+			                {% endfor %}
+					    </select>
+		                <label for="name">Playlist</label>
+		                <div id="playlistHelp" class="form-text">Select an imported playlist</div>
+		            </div>
+
+		            <div class="form-floating mb-3">
+		                <input type="password" class="form-control" id="password" name="password"placeholder="password">
+		                <label for="password">Group Password</label>
+		                <div id="passwordHelp" class="form-text">Input {{ group.name }}'s password</div>
+		            </div>
+
+		            <button type="submit" class="btn btn-primary">Submit Playlist</button>
+
+		        </form>
+
+				{% else %}
+
+				<h6 class="text-center">No playlists to add!</h6> 
+				<div class="d-flex justify-content-center">
+					<a role="button" class="btn btn-outline-primary" href="{% url 'importplaylist' %}">Import Playlist</a>
+				</div>
+
+				{% endif %}
+
+			{% else %}
+
+				<h6 class="text-center">You must be logged in to submit playlists!</h6> 
+				<div class="d-flex justify-content-center">
+			        <table>
+			          <form action="{% url 'loginuser' %}">
+			              <button type="submit" class="btn btn-outline-primary me-2">Login</button>
+			          </form>
+			          <form action="{% url 'signupuser' %}">
+			              <button type="submit" class="btn btn-primary">Sign-up</button>
+			          </form>
+			        </table>
+				</div>
+
+			{% endif %}
+
+			</div>
+		</div>
+	</div>
+
+	{% if request.user == group.user %}
+    <div class="col-6">
+
+    	<div class="card">
+
+		  <div class="card-header">
+		    <h3>Create {{ group.name }} Topslist:</h3>
+		  </div>
+
+			<div class="card-body">
+
+	    		{% if group_playlists %}
+
+			    <form method="POST" action="{% url 'aggregategroup' group.pk %}">
+			    	{% csrf_token %}
+			    	<div class="row">
+
+				    	<div class=col-6>
+				            <div class="form-floating mb-3">
+				                <input type="date" class="form-control" id="min_date" name="min_date"placeholder="min_date" value="{{ group.min_date|date:'Y-m-d' }}" required>
+				                <label for="min_date">Date Range Start</label>
+				                <div id="mindateHelp" class="form-text">Select earliest release date</div>
+				            </div>
+
+				            <div class="form-floating mb-3">
+				                <input type="number" class="form-control" id="playlistlength" name="playlistlength"placeholder="playlistlength" value="{{ group.playlistlength }}" required>
+				                <label for="playlistlength">Playlist Length</label>
+				                <div id="playlistlengthHelp" class="form-text">Enter Desired Length of Playlist</div>
+				            </div>
+			            </div>
+
+			            <div class=col-6>
+				            <div class="form-floating mb-3">
+				                <input type="date" class="form-control" id="max_date" name="max_date" placeholder="max_date" value="{{ group.max_date|date:'Y-m-d' }}" required>
+				                <label for="max_date">Date Range End</label>
+				                <div id="max_dateHelp" class="form-text">Select latest release date</div>
+				            </div>
+
+				            <div class="form-floating mb-3">
+				                <input type="text" class="form-control" id="spotify_user_id" name="spotify_user_id" placeholder="spotify user id" required>
+				                <label for="spotify_user_id">Spotify Username</label>
+				                <div id="spotifyuseridHelp" class="form-text">Provide your Spotify Username</div>
+				            </div>				            
+			            </div>
+
+			        </div>
+
+			        <div class="one d-flex justify-content-end">
+			    		<button type="submit" class="btn btn-dark">Aggregate Playlist</button>
+			    	</div>
+
+			    </form>
+
+	    		{% else %}
+
+	    		<h6 class="fst-italic text-center">Check back once playlists have been submitted!</h6> 
+
+	    	{% endif %}
+		
+			</div>
+		</div>
+	</div>
+
+    {% endif %}
+
+</div>
+
+<div class="container">
+
+	<hr class="rounded">
+
+	{% if group_playlists %}
+
+	<h3>Submitted Playlists ({{ group_playlists.count }}):</h3>
+	<table class="table table-hover">
+	  	<thead>
+	    	<tr>
+		      <th scope="col">User</th>
+		      <th scope="col">Playlist Name</th>
+		      <th scope="col"># of Songs</th>
+		      <th scope="col">Link</th>
+	    	</tr>
+	  	</thead>
+	  	<tbody>
+	  	{% for playlist in group_playlists %}
+	  		<tr>
+		  		<td>{{ playlist.user }}</td>
+		      	<td>{{ playlist.name }}</td>
+		      	<td>{{ playlist.songs }}</td>
+		      	<td><a href="{{ playlist.url }}" target="_blank" rel="noopener noreferrer">Listen Here</a></td>
+		    </tr>
+		{% endfor %}    
+		</tbody>
+	</table>
+		    
+	{% else %}
+
+	<div class="text-center">
+	    <h2>No playlists have been submitted yet!</h2>
+	</div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

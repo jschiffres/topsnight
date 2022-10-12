@@ -1,0 +1,70 @@
+{% extends 'TopsListGenerator/base.html' %}
+
+{% block content %}
+
+<h1>All Groups</h1>
+
+{% if user.is_authenticated %}
+    <form action="{% url 'creategroup' %}">
+	    	<button type="submit" class="btn btn-outline-primary me-2">Create Group</button>
+	</form>
+
+{% else %}
+
+Only users can create groups!
+			        <table>
+			          <form action="{% url 'loginuser' %}">
+			              <button type="submit" class="btn btn-outline-primary me-2">Login</button>
+			          </form>
+			          <form action="{% url 'signupuser' %}">
+			              <button type="submit" class="btn btn-primary">Sign-up</button>
+			          </form>
+			        </table>
+
+{% endif %}
+
+	<hr class="rounded">
+
+	<div>
+
+	    {% if groups %}
+	    	<table class="table table-hover">
+			  	<thead>
+			    	<tr>
+				      <th scope="col">Group Name</th>
+				      <th scope="col">Created By</th>
+				      <th scope="col">Date Created</th>
+				      <th scope="col">Topslist Length</th>
+				      <th scope="col">Release Date Range</th>
+				      <th scope="col">View</th>
+			    	</tr>
+			  	</thead>
+			  	<tbody>
+			  	{% for group in groups %}
+			  		<tr>
+				  		<td>{{ group.name }}</td>
+				      	<td>{{ group.user }}</td>
+				      	<td>{{ group.created|date:"M d, Y" }}</td>
+				      	<td>{{ group.playlistlength }}</td>
+				      	<td>{{ group.min_date|date:"M d, Y" }} to {{ group.max_date|date:"M d, Y" }}</td>
+				      	<td>
+					      		<form action="{% url 'viewgroup' group.pk %}">
+	      							<button type="submit" class="btn btn-primary">View Group</button>
+	      						</form>
+				      	</td>
+				    </tr>
+				{% endfor %}    
+				</tbody>
+			</table>			 
+	    
+	    {% else %}
+
+	        <div class="text-center">
+	            <h2>Looks like you haven't created any groups!</h2>
+	        	<br>
+	        	<a role="button" class="btn btn-primary" href="{% url 'creategroup' %}">Create Group</a>
+	        </div>
+	    {% endif %}
+	</div>
+
+{% endblock %}

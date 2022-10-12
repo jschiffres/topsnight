@@ -1,0 +1,62 @@
+{% extends 'TopsListGenerator/base.html' %}
+
+{% block content %}
+
+{% if groups %}
+
+<h1>{{ user.username }}'s Groups</h1>
+
+	<div>
+
+	    <form action="{% url 'creategroup' %}">
+		    	<button type="submit" class="btn btn-outline-primary me-2">Create Group</button>
+		</form>
+
+		<hr class="rounded">
+
+	    	<table class="table">
+			  	<thead>
+			    	<tr>
+				      <th scope="col">Group Name</th>
+				      <th scope="col">Date Created</th>
+				      <th scope="col">View</th>
+				      <th scope="col">Edit</th>
+			    	</tr>
+			  	</thead>
+			  	<tbody>
+			  	{% for group in groups %}
+			  		<tr>
+				  		<td>{{ group.name }}</td>
+				      	<td>{{ group.created|date:"M d, Y"  }}</td>
+				      	<td>
+				      		<table>
+					      		<form action="{% url 'viewgroup' group.pk %}">
+	      							<button type="submit" class="btn btn-primary">View Group</button>
+	      						</form>
+	      					</table>
+				      	</td>
+				      	<td>
+				      		<table>
+	      						<form action="{% url 'editgroup' group.pk %}">
+	      							<button type="submit" class="btn btn-dark">Edit Group</button>
+	      						</form>
+	      					</table>
+				      	</td>
+				    </tr>
+				{% endfor %}    
+				</tbody>
+			</table>			 
+	    
+	    {% else %}
+
+	        <div class="text-center">
+	            <h2>Looks like you haven't created any groups!</h2>
+	        	<br>
+	        	<a role="button" class="btn btn-outline-primary" href="{% url 'creategroup' %}">Create Group</a>
+	        	<h6>or</h6>
+	        	<a role="button" class="btn btn-outline-primary" href="{% url 'allgroups' %}">Join Group</a>
+	        </div>
+	    {% endif %}
+	</div>
+
+{% endblock %}
